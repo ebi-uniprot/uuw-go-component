@@ -1,0 +1,377 @@
+var GoVis = (function () {
+'use strict';
+
+function ___$insertStyle(css) {
+  if (!css) {
+    return;
+  }
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  var style = document.createElement('style');
+
+  style.setAttribute('type', 'text/css');
+  style.innerHTML = css;
+  document.head.appendChild(style);
+
+  return css;
+}
+
+___$insertStyle("go-vis {\n  font-family: Roboto; }\n  go-vis span {\n    margin-left: .5em; }\n  go-vis ul {\n    list-style: none;\n    margin: 0;\n    padding: 0; }\n  go-vis > ul {\n    padding: 1.5em;\n    border: 1px solid #CACACA;\n    columns: 2;\n    -webkit-columns: 2;\n    -moz-columns: 2; }\n  go-vis li ul {\n    display: none; }\n  go-vis li.open > ul {\n    display: block; }\n  go-vis li {\n    line-height: 2em; }\n    go-vis li.branch > div {\n      cursor: pointer; }\n      go-vis li.branch > div::after {\n        content: '';\n        display: inline-block;\n        margin: .5em;\n        vertical-align: text-bottom;\n        border: solid #CACACA;\n        border-width: 0 3px 3px 0;\n        padding: 3px;\n        transform: rotate(45deg);\n        -webkit-transform: rotate(45deg);\n        transition: 0.5s ease-in-out;\n        -webkit-transition: 0.5s ease-in-out;\n        -moz-transition: 0.5s ease-in-out;\n        -o-transition: 0.5s ease-in-out; }\n    go-vis li.open.branch > div::after {\n      transform: rotate(-145deg);\n      -webkit-transform: rotate(-145deg); }\n  go-vis .evidence-tag {\n    font-size: .7em;\n    padding: .5em;\n    background-color: #d3e8fe; }\n");
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _CustomElement() {
+    return Reflect.construct(HTMLElement, [], this.__proto__.constructor);
+}
+
+
+Object.setPrototypeOf(_CustomElement.prototype, HTMLElement.prototype);
+Object.setPrototypeOf(_CustomElement, HTMLElement);
+var GoVis = function (_CustomElement2) {
+    _inherits(GoVis, _CustomElement2);
+
+    function GoVis() {
+        _classCallCheck(this, GoVis);
+
+        var _this = _possibleConstructorReturn(this, (GoVis.__proto__ || Object.getPrototypeOf(GoVis)).call(this));
+
+        _this.annotationTerms = [];
+        _this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
+        _this.accession = '';
+        return _this;
+    }
+
+    _createClass(GoVis, [{
+        key: 'attributeChangedCallback',
+        value: function attributeChangedCallback() {
+            this.innerHTML = ''; //this should be avoided
+            this.loadData();
+            console.log('Loaded ' + this.accession);
+        }
+    }, {
+        key: 'loadData',
+        value: function loadData() {
+            var _this2 = this;
+
+            this.getAnnotationTerms(this.accession).then(function (stream) {
+                stream.json().then(function (d) {
+                    _this2.annotationTerms = d.dbReferences.filter(function (d) {
+                        return d.type === 'GO';
+                    });
+                    var goIds = _this2.annotationTerms.filter(function (d) {
+                        return d.type === 'GO';
+                    }).map(function (d) {
+                        return d.id;
+                    });
+                    _this2.getSlimSet().then(function (stream) {
+                        stream.json().then(function (d) {
+                            var slimIds = d.goSlimSets.filter(function (f) {
+                                return f.name === 'goslim_generic';
+                            })[0].associations.map(function (term) {
+                                return term.id;
+                            });
+                            // remove root nodes
+                            var _iteratorNormalCompletion = true;
+                            var _didIteratorError = false;
+                            var _iteratorError = undefined;
+
+                            try {
+                                for (var _iterator = _this2.goRootNodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                    var rootNode = _step.value;
+
+                                    slimIds.splice(slimIds.indexOf(rootNode), 1);
+                                }
+                            } catch (err) {
+                                _didIteratorError = true;
+                                _iteratorError = err;
+                            } finally {
+                                try {
+                                    if (!_iteratorNormalCompletion && _iterator.return) {
+                                        _iterator.return();
+                                    }
+                                } finally {
+                                    if (_didIteratorError) {
+                                        throw _iteratorError;
+                                    }
+                                }
+                            }
+
+                            _this2.getTermGraph(goIds, slimIds).then(function (d) {
+                                return d.json().then(function (graph) {
+                                    var tree = _this2.buildTree(graph.results[0].vertices, graph.results[0].edges);
+                                    var ul = document.createElement('ul');
+                                    _this2.traverseTree(tree, ul);
+                                    _this2.appendChild(ul);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        }
+    }, {
+        key: 'getAnnotationTerms',
+        value: function getAnnotationTerms(accession) {
+            var headers = new Headers({
+                'Accept': 'application/json'
+            });
+            var init = {
+                method: 'GET',
+                headers: headers,
+                mode: 'cors',
+                cached: 'default'
+            };
+            return fetch('https://www.ebi.ac.uk/proteins/api/proteins/' + accession, init);
+        }
+    }, {
+        key: 'getSlimSet',
+        value: function getSlimSet() {
+            return fetch('https://www.ebi.ac.uk/QuickGO/services/internal/presets?fields=goSlimSets');
+        }
+    }, {
+        key: 'getTermGraph',
+        value: function getTermGraph(goIds, slimIds) {
+            return fetch('https://wwwdev.ebi.ac.uk/QuickGO/services/ontology/go/terms/graph?startIds=' + goIds + '&stopIds=' + slimIds + '&relations=is_a');
+        }
+    }, {
+        key: 'buildTree',
+        value: function buildTree(nodes, edges) {
+            // Initialise node array
+            nodes.map(function (n) {
+                return n.children = [];
+            });
+            var rootNodes = nodes.map(function (n) {
+                return n.id;
+            });
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                var _loop = function _loop() {
+                    var edge = _step2.value;
+
+                    var parent = nodes.filter(function (node) {
+                        return node.id === edge.object;
+                    })[0];
+                    var child = nodes.filter(function (node) {
+                        return node.id === edge.subject;
+                    })[0];
+                    if (rootNodes.indexOf(child.id) >= 0) {
+                        rootNodes.splice(rootNodes.indexOf(child.id), 1);
+                    }
+                    parent.children.push(child);
+                };
+
+                for (var _iterator2 = edges[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    _loop();
+                }
+                // Return root nodes
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
+            return nodes.filter(function (node) {
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
+
+                try {
+                    for (var _iterator3 = rootNodes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var rootNode = _step3.value;
+
+                        if (node.id === rootNode) {
+                            return true;
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
+                        }
+                    } finally {
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
+                        }
+                    }
+                }
+
+                return false;
+            });
+        }
+    }, {
+        key: 'traverseTree',
+        value: function traverseTree(children, el) {
+            var _this3 = this;
+
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                var _loop2 = function _loop2() {
+                    var node = _step4.value;
+
+                    var div = document.createElement('div');
+                    var li = document.createElement('li');
+                    var a = document.createElement('a');
+                    a.setAttribute('href', 'http://www.ebi.ac.uk/QuickGO-Beta/term/' + node.id);
+                    a.textContent = node.id;
+                    var span = document.createElement('span');
+                    var annotationNode = _this3.annotationTerms.find(function (d) {
+                        return d.id === node.id;
+                    });
+                    span.style.fontWeight = annotationNode ? 'bold' : 'normal';
+                    span.textContent = node.label;
+                    div.appendChild(a);
+                    div.appendChild(span);
+                    li.appendChild(div);
+                    if (annotationNode) {
+                        div.appendChild(_this3.getRenderSource(annotationNode.properties));
+                    }
+                    el.appendChild(li);
+                    if (node.children && node.children.length > 0) {
+                        div.addEventListener('click', _this3.nodeClick);
+                        li.classList.add('branch');
+                        var ul = document.createElement('ul');
+                        ul.style.marginLeft = '1em';
+                        li.appendChild(ul);
+                        _this3.traverseTree(node.children, ul);
+                    }
+                };
+
+                for (var _iterator4 = children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    _loop2();
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'nodeClick',
+        value: function nodeClick() {
+            this.parentElement.classList.toggle('open');
+        }
+    }, {
+        key: 'getRenderSource',
+        value: function getRenderSource(source) {
+            var span = document.createElement('span');
+            span.classList.add('evidence-tag');
+            span.textContent = source.source;
+            return span;
+        }
+    }, {
+        key: 'expandAll',
+        value: function expandAll() {
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+                for (var _iterator5 = this.querySelectorAll('.branch')[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var _li = _step5.value;
+
+                    _li.classList.add('open');
+                }
+            } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                    }
+                } finally {
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'collapseAll',
+        value: function collapseAll() {
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+                for (var _iterator6 = this.querySelectorAll('.open')[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var _li2 = _step6.value;
+
+                    _li2.classList.remove('open');
+                }
+            } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
+                    }
+                } finally {
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'accession',
+        set: function set(acc) {
+            if (acc) {
+                this.setAttribute('accession', acc);
+            }
+        },
+        get: function get() {
+            return this.getAttribute('accession');
+        }
+    }], [{
+        key: 'observedAttributes',
+        get: function get() {
+            return ['accession'];
+        }
+    }]);
+
+    return GoVis;
+}(_CustomElement);
+
+customElements.define('go-vis', GoVis);
+
+return GoVis;
+
+}());
+//# sourceMappingURL=govis.js.map
