@@ -5,7 +5,9 @@
 </head>
 
 <body>
-    <button id="expand">Expand all</button><button id="collapse">Collapse all</button>
+    <p>
+        <input type="text" id="accession"><button id="load">Load</button><button id="expand">Expand all</button><button id="collapse">Collapse all</button>
+    </p>
     <go-vis accession="P05067" />
     <script>
         document.querySelector('#expand').addEventListener('click', d => {
@@ -13,6 +15,9 @@
         });
         document.querySelector('#collapse').addEventListener('click', d => {
             document.querySelector('go-vis').collapseAll();
+        });
+        document.querySelector('#load').addEventListener('click', d => {
+            document.querySelector('go-vis').setAttribute('accession', document.querySelector('#accession').value);
         });
     </script>
 </body>

@@ -5,11 +5,31 @@ class GoVis extends HTMLElement {
         super();
         this.annotationTerms = [];
         this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
+        this.accession = '';
     }
 
-    connectedCallback() {
-        let acc = this.getAttribute('accession');
-        this.getAnnotationTerms(acc).then(stream => {
+    attributeChangedCallback() {
+        this.innerHTML = ''; //this should be avoided
+        this.loadData();
+        console.log(`Loaded ${this.accession}`);
+    }
+
+    static get observedAttributes() {
+        return ['accession'];
+    }
+
+    set accession(acc) {
+        if (acc) {
+            this.setAttribute('accession', acc);
+        }
+    }
+
+    get accession() {
+        return this.getAttribute('accession');
+    }
+
+    loadData() {
+        this.getAnnotationTerms(this.accession).then(stream => {
             stream.json().then(d => {
                 this.annotationTerms = d.dbReferences.filter(d => d.type === 'GO');
                 let goIds = this.annotationTerms.filter(d => d.type === 'GO').map(d => d.id);
