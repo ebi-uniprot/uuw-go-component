@@ -8,14 +8,19 @@ class GoVis extends HTMLElement {
         this.accession = '';
     }
 
-    attributeChangedCallback() {
-        this.innerHTML = ''; //this should be avoided
+    connectedCallback() {
         this.loadData();
-        console.log(`Loaded ${this.accession}`);
+    }
+
+    attributeChangedCallback(attrName, oldVal, newVal) {
+        if (oldVal !== null) {
+            this.innerHTML = ''; //this should be avoided
+            this.loadData();
+        }
     }
 
     static get observedAttributes() {
-        return ['accession'];
+        return ['accession', 'slimset'];
     }
 
     set accession(acc) {
@@ -24,18 +29,29 @@ class GoVis extends HTMLElement {
         }
     }
 
+    get slimset() {
+        return this.getAttribute('slimset');
+    }
+
+    set slimset(slimset) {
+        if (slimset) {
+            this.setAttribute('slimset', slimset);
+        }
+    }
+
     get accession() {
         return this.getAttribute('accession');
     }
 
     loadData() {
+        console.log('loading...')
         this.getAnnotationTerms(this.accession).then(stream => {
             stream.json().then(d => {
                 this.annotationTerms = d.dbReferences.filter(d => d.type === 'GO');
                 let goIds = this.annotationTerms.filter(d => d.type === 'GO').map(d => d.id);
                 this.getSlimSet().then(stream => {
                     stream.json().then(d => {
-                        const slimIds = d.goSlimSets.filter(f => f.name === 'goslim_generic')[0].associations.map(term => term.id);
+                        const slimIds = d.goSlimSets.filter(f => f.name === this.slimset)[0].associations.map(term => term.id);
                         // remove root nodes
                         for (const rootNode of this.goRootNodes) {
                             slimIds.splice(slimIds.indexOf(rootNode), 1);
@@ -45,6 +61,7 @@ class GoVis extends HTMLElement {
                             const ul = document.createElement('ul');
                             this.traverseTree(tree, ul);
                             this.appendChild(ul);
+                            console.log('Loaded')
                         }));
                     });
                 })

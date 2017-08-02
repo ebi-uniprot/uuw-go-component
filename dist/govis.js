@@ -50,17 +50,24 @@ var GoVis = function (_CustomElement2) {
     }
 
     _createClass(GoVis, [{
-        key: 'attributeChangedCallback',
-        value: function attributeChangedCallback() {
-            this.innerHTML = ''; //this should be avoided
+        key: 'connectedCallback',
+        value: function connectedCallback() {
             this.loadData();
-            console.log('Loaded ' + this.accession);
+        }
+    }, {
+        key: 'attributeChangedCallback',
+        value: function attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal !== null) {
+                this.innerHTML = ''; //this should be avoided
+                this.loadData();
+            }
         }
     }, {
         key: 'loadData',
         value: function loadData() {
             var _this2 = this;
 
+            console.log('loading...');
             this.getAnnotationTerms(this.accession).then(function (stream) {
                 stream.json().then(function (d) {
                     _this2.annotationTerms = d.dbReferences.filter(function (d) {
@@ -74,7 +81,7 @@ var GoVis = function (_CustomElement2) {
                     _this2.getSlimSet().then(function (stream) {
                         stream.json().then(function (d) {
                             var slimIds = d.goSlimSets.filter(function (f) {
-                                return f.name === 'goslim_generic';
+                                return f.name === _this2.slimset;
                             })[0].associations.map(function (term) {
                                 return term.id;
                             });
@@ -110,6 +117,7 @@ var GoVis = function (_CustomElement2) {
                                     var ul = document.createElement('ul');
                                     _this2.traverseTree(tree, ul);
                                     _this2.appendChild(ul);
+                                    console.log('Loaded');
                                 });
                             });
                         });
@@ -359,10 +367,20 @@ var GoVis = function (_CustomElement2) {
         get: function get() {
             return this.getAttribute('accession');
         }
+    }, {
+        key: 'slimset',
+        get: function get() {
+            return this.getAttribute('slimset');
+        },
+        set: function set(slimset) {
+            if (slimset) {
+                this.setAttribute('slimset', slimset);
+            }
+        }
     }], [{
         key: 'observedAttributes',
         get: function get() {
-            return ['accession'];
+            return ['accession', 'slimset'];
         }
     }]);
 

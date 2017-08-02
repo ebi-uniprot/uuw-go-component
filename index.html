@@ -6,9 +6,30 @@
 
 <body>
     <p>
-        <input type="text" id="accession"><button id="load">Load</button><button id="expand">Expand all</button><button id="collapse">Collapse all</button>
+        <input type="text" id="accession">
+        <button id="load">Load</button>
+        <button id="expand">Expand all</button>
+        <button id="collapse">Collapse all</button>
+        <label>
+            Slim set
+            <select id="slimset">
+                <option value="goslim_agr">goslim_agr</option>
+                <option value="goslim_aspergillus">goslim_aspergillus</option>
+                <option value="goslim_candida">goslim_candida</option>
+                <option value="goslim_chembl">goslim_chembl</option>
+                <option value="goslim_generic" selected>goslim_generic</option>
+                <option value="goslim_metagenomics">goslim_metagenomics</option>
+                <option value="goslim_mouse">goslim_mouse</option>
+                <option value="goslim_pir">goslim_pir</option>
+                <option value="goslim_plant">goslim_plant</option>
+                <option value="goslim_pombe">goslim_pombe</option>
+                <option value="goslim_synapse">goslim_synapse</option>
+                <option value="goslim_virus">goslim_virus</option>
+                <option value="goslim_yeast">goslim_yeast</option>
+            </select>
+        </label>
     </p>
-    <go-vis accession="P05067" />
+    <go-vis accession="P05067" slimset="goslim_generic" />
     <script>
         document.querySelector('#expand').addEventListener('click', d => {
             document.querySelector('go-vis').expandAll();
@@ -16,8 +37,13 @@
         document.querySelector('#collapse').addEventListener('click', d => {
             document.querySelector('go-vis').collapseAll();
         });
+
         document.querySelector('#load').addEventListener('click', d => {
             document.querySelector('go-vis').setAttribute('accession', document.querySelector('#accession').value);
+        });
+
+        document.querySelector('#slimset').addEventListener('change', d => {
+            document.querySelector('go-vis').setAttribute('slimset', d.target.value);
         });
     </script>
 </body>
