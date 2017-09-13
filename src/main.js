@@ -97,6 +97,10 @@ class GoVis extends HTMLElement {
         for (const edge of edges) {
             let parent = nodes.filter(node => node.id === edge.object)[0];
             let child = nodes.filter(node => node.id === edge.subject)[0];
+            // check for bug in backend
+            if (!parent || !child) {
+                continue;
+            }
             if (rootNodes.indexOf(child.id) >= 0) {
                 rootNodes.splice(rootNodes.indexOf(child.id), 1);
             }

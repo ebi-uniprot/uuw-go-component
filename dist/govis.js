@@ -173,6 +173,10 @@ var GoVis = function (_CustomElement2) {
                     var child = nodes.filter(function (node) {
                         return node.id === edge.subject;
                     })[0];
+                    // check for bug in backend
+                    if (!parent || !child) {
+                        return 'continue';
+                    }
                     if (rootNodes.indexOf(child.id) >= 0) {
                         rootNodes.splice(rootNodes.indexOf(child.id), 1);
                     }
@@ -180,7 +184,9 @@ var GoVis = function (_CustomElement2) {
                 };
 
                 for (var _iterator2 = edges[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    _loop();
+                    var _ret = _loop();
+
+                    if (_ret === 'continue') continue;
                 }
                 // Return root nodes
             } catch (err) {
