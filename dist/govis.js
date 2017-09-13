@@ -115,7 +115,7 @@ var GoVis = function (_CustomElement2) {
                                 return d.json().then(function (graph) {
                                     var tree = _this2.buildTree(graph.results[0].vertices, graph.results[0].edges);
                                     var ul = document.createElement('ul');
-                                    _this2.traverseTree(tree, ul);
+                                    _this2.renderSlimsTree(tree, ul);
                                     _this2.appendChild(ul);
                                     console.log('Loaded');
                                 });
@@ -236,48 +236,76 @@ var GoVis = function (_CustomElement2) {
             });
         }
     }, {
-        key: 'traverseTree',
-        value: function traverseTree(children, el) {
-            var _this3 = this;
-
+        key: 'renderGoTerm',
+        value: function renderGoTerm(node) {
+            var div = document.createElement('div');
+            var li = document.createElement('li');
+            var a = document.createElement('a');
+            a.setAttribute('href', 'http://www.ebi.ac.uk/QuickGO-Beta/term/' + node.id);
+            a.textContent = node.id;
+            var span = document.createElement('span');
+            var annotationNode = this.annotationTerms.find(function (d) {
+                return d.id === node.id;
+            });
+            span.style.fontWeight = annotationNode ? 'bold' : 'normal';
+            span.textContent = node.label;
+            div.appendChild(a);
+            div.appendChild(span);
+            li.appendChild(div);
+            if (annotationNode) {
+                div.appendChild(this.getRenderSource(annotationNode.properties));
+            }
+            if (node.children && node.children.length > 0) {
+                div.addEventListener('click', this.nodeClick);
+                li.classList.add('branch');
+            }
+            return li;
+        }
+    }, {
+        key: 'renderSlimsTree',
+        value: function renderSlimsTree(children, el) {
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
 
             try {
-                var _loop2 = function _loop2() {
+                for (var _iterator4 = children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                     var node = _step4.value;
 
-                    var div = document.createElement('div');
-                    var li = document.createElement('li');
-                    var a = document.createElement('a');
-                    a.setAttribute('href', 'http://www.ebi.ac.uk/QuickGO-Beta/term/' + node.id);
-                    a.textContent = node.id;
-                    var span = document.createElement('span');
-                    var annotationNode = _this3.annotationTerms.find(function (d) {
-                        return d.id === node.id;
-                    });
-                    span.style.fontWeight = annotationNode ? 'bold' : 'normal';
-                    span.textContent = node.label;
-                    div.appendChild(a);
-                    div.appendChild(span);
-                    li.appendChild(div);
-                    if (annotationNode) {
-                        div.appendChild(_this3.getRenderSource(annotationNode.properties));
-                    }
+                    var li = this.renderGoTerm(node);
                     el.appendChild(li);
                     if (node.children && node.children.length > 0) {
-                        div.addEventListener('click', _this3.nodeClick);
-                        li.classList.add('branch');
+                        var endNodes = this.traverseTree(node.children);
                         var ul = document.createElement('ul');
                         ul.style.marginLeft = '1em';
-                        li.appendChild(ul);
-                        _this3.traverseTree(node.children, ul);
-                    }
-                };
+                        var _iteratorNormalCompletion5 = true;
+                        var _didIteratorError5 = false;
+                        var _iteratorError5 = undefined;
 
-                for (var _iterator4 = children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    _loop2();
+                        try {
+                            for (var _iterator5 = endNodes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                                var endNode = _step5.value;
+
+                                var endLi = this.renderGoTerm(endNode);
+                                ul.appendChild(endLi);
+                            }
+                        } catch (err) {
+                            _didIteratorError5 = true;
+                            _iteratorError5 = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                                    _iterator5.return();
+                                }
+                            } finally {
+                                if (_didIteratorError5) {
+                                    throw _iteratorError5;
+                                }
+                            }
+                        }
+
+                        li.appendChild(ul);
+                    }
                 }
             } catch (err) {
                 _didIteratorError4 = true;
@@ -295,6 +323,41 @@ var GoVis = function (_CustomElement2) {
             }
         }
     }, {
+        key: 'traverseTree',
+        value: function traverseTree(children) {
+            var endNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Set();
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+                for (var _iterator6 = children[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var node = _step6.value;
+
+                    if (node.children && node.children.length > 0) {
+                        this.traverseTree(node.children, endNodes);
+                    } else {
+                        endNodes.add(node);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
+                    }
+                } finally {
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
+                    }
+                }
+            }
+
+            return endNodes;
+        }
+    }, {
         key: 'nodeClick',
         value: function nodeClick() {
             this.parentElement.classList.toggle('open');
@@ -310,27 +373,27 @@ var GoVis = function (_CustomElement2) {
     }, {
         key: 'expandAll',
         value: function expandAll() {
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
 
             try {
-                for (var _iterator5 = this.querySelectorAll('.branch')[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var _li = _step5.value;
+                for (var _iterator7 = this.querySelectorAll('.branch')[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var li = _step7.value;
 
-                    _li.classList.add('open');
+                    li.classList.add('open');
                 }
             } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                        _iterator7.return();
                     }
                 } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
+                    if (_didIteratorError7) {
+                        throw _iteratorError7;
                     }
                 }
             }
@@ -338,27 +401,27 @@ var GoVis = function (_CustomElement2) {
     }, {
         key: 'collapseAll',
         value: function collapseAll() {
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
+            var _iteratorNormalCompletion8 = true;
+            var _didIteratorError8 = false;
+            var _iteratorError8 = undefined;
 
             try {
-                for (var _iterator6 = this.querySelectorAll('.open')[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                    var _li2 = _step6.value;
+                for (var _iterator8 = this.querySelectorAll('.open')[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                    var li = _step8.value;
 
-                    _li2.classList.remove('open');
+                    li.classList.remove('open');
                 }
             } catch (err) {
-                _didIteratorError6 = true;
-                _iteratorError6 = err;
+                _didIteratorError8 = true;
+                _iteratorError8 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                        _iterator6.return();
+                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                        _iterator8.return();
                     }
                 } finally {
-                    if (_didIteratorError6) {
-                        throw _iteratorError6;
+                    if (_didIteratorError8) {
+                        throw _iteratorError8;
                     }
                 }
             }

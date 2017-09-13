@@ -53,13 +53,13 @@ class GoVis extends HTMLElement {
                     stream.json().then(d => {
                         const slimIds = d.goSlimSets.filter(f => f.name === this.slimset)[0].associations.map(term => term.id);
                         // remove root nodes
-                        for (const rootNode of this.goRootNodes) {
+                        for (const rootNode of this., , , , , , ) {
                             slimIds.splice(slimIds.indexOf(rootNode), 1);
                         }
                         this.getTermGraph(goIds, slimIds).then(d => d.json().then(graph => {
                             const tree = this.buildTree(graph.results[0].vertices, graph.results[0].edges);
                             const ul = document.createElement('ul');
-                            this.traverseTree(tree, ul);
+                            this.renderSlimsTree(tree, ul);
                             this.appendChild(ul);
                             console.log('Loaded')
                         }));
@@ -117,33 +117,55 @@ class GoVis extends HTMLElement {
         })
     }
 
-    traverseTree(children, el) {
+    renderGoTerm(node) {
+        const div = document.createElement('div');
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.setAttribute('href', `http://www.ebi.ac.uk/QuickGO-Beta/term/${node.id}`);
+        a.textContent = node.id;
+        const span = document.createElement('span');
+        let annotationNode = this.annotationTerms.find(d => d.id === node.id);
+        span.style.fontWeight = annotationNode ? 'bold' : 'normal';
+        span.textContent = node.label;
+        div.appendChild(a);
+        div.appendChild(span);
+        li.appendChild(div);
+        if (annotationNode) {
+            div.appendChild(this.getRenderSource(annotationNode.properties));
+        }
+        if (node.children && node.children.length > 0) {
+            div.addEventListener('click', this.nodeClick);
+            li.classList.add('branch');
+        }
+        return li;
+    }
+
+    renderSlimsTree(children, el) {
         for (const node of children) {
-            const div = document.createElement('div');
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.setAttribute('href', `http://www.ebi.ac.uk/QuickGO-Beta/term/${node.id}`);
-            a.textContent = node.id;
-            const span = document.createElement('span');
-            let annotationNode = this.annotationTerms.find(d => d.id === node.id);
-            span.style.fontWeight = annotationNode ? 'bold' : 'normal';
-            span.textContent = node.label;
-            div.appendChild(a);
-            div.appendChild(span);
-            li.appendChild(div);
-            if (annotationNode) {
-                div.appendChild(this.getRenderSource(annotationNode.properties));
-            }
+            const li = this.renderGoTerm(node);
             el.appendChild(li);
             if (node.children && node.children.length > 0) {
-                div.addEventListener('click', this.nodeClick);
-                li.classList.add('branch');
+                const endNodes = this.traverseTree(node.children);
                 const ul = document.createElement('ul');
                 ul.style.marginLeft = '1em';
+                for (const endNode of endNodes) {
+                    const endLi = this.renderGoTerm(endNode);
+                    ul.appendChild(endLi);
+                }
                 li.appendChild(ul);
-                this.traverseTree(node.children, ul);
             }
         }
+    }
+
+    traverseTree(children, endNodes = new Set()) {
+        for (const node of children) {
+            if (node.children && node.children.length > 0) {
+                this.traverseTree(node.children, endNodes)
+            } else {
+                endNodes.add(node);
+            }
+        }
+        return endNodes;
     }
 
     nodeClick() {
