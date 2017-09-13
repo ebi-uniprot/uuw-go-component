@@ -53,7 +53,7 @@ class GoVis extends HTMLElement {
                     stream.json().then(d => {
                         const slimIds = d.goSlimSets.filter(f => f.name === this.slimset)[0].associations.map(term => term.id);
                         // remove root nodes
-                        for (const rootNode of this., , , , , , ) {
+                        for (const rootNode of this.goRootNodes) {
                             slimIds.splice(slimIds.indexOf(rootNode), 1);
                         }
                         this.getTermGraph(goIds, slimIds).then(d => d.json().then(graph => {
@@ -142,6 +142,9 @@ class GoVis extends HTMLElement {
 
     renderSlimsTree(children, el) {
         for (const node of children) {
+            if (this.goRootNodes.includes(node.id)) {
+                continue;
+            }
             const li = this.renderGoTerm(node);
             el.appendChild(li);
             if (node.children && node.children.length > 0) {

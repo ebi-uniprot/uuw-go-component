@@ -47,8 +47,8 @@ go-vis {
         &.open.branch {
             &>div {
                 &::after {
-                    transform: rotate(-145deg);
-                    -webkit-transform: rotate(-145deg);
+                    transform: rotate(-135deg);
+                    -webkit-transform: rotate(-135deg);
                 }
             }
         }
