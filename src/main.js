@@ -131,7 +131,7 @@ class GoVis extends HTMLElement {
         div.appendChild(span);
         li.appendChild(div);
         if (annotationNode) {
-            div.appendChild(this.getRenderSource(annotationNode.properties));
+            div.appendChild(this.getRenderSource(annotationNode));
         }
         if (node.children && node.children.length > 0) {
             div.addEventListener('click', this.nodeClick);
@@ -178,7 +178,14 @@ class GoVis extends HTMLElement {
     getRenderSource(source) {
         const span = document.createElement('span');
         span.classList.add('evidence-tag');
-        span.textContent = source.source;
+        span.textContent = source.properties.source;
+        if (source.evidences) {
+            let evidences = '';
+            for (const evidence of source.evidences) {
+                evidences = `${evidences} ${evidence.source.name}:${evidence.source.id}`;
+            }
+            span.title = evidences;
+        }
         return span;
     }
 

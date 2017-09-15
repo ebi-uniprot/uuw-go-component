@@ -18,7 +18,7 @@ function ___$insertStyle(css) {
   return css;
 }
 
-___$insertStyle("go-vis {\n  font-family: Roboto; }\n  go-vis span {\n    margin-left: .5em; }\n  go-vis ul {\n    list-style: none;\n    margin: 0;\n    padding: 0; }\n  go-vis > ul {\n    padding: 1.5em;\n    border: 1px solid #CACACA;\n    columns: 2;\n    -webkit-columns: 2;\n    -moz-columns: 2; }\n  go-vis li ul {\n    display: none; }\n  go-vis li.open > ul {\n    display: block; }\n  go-vis li {\n    line-height: 2em; }\n    go-vis li.branch > div {\n      cursor: pointer; }\n      go-vis li.branch > div::after {\n        content: '';\n        display: inline-block;\n        margin: .5em;\n        vertical-align: text-bottom;\n        border: solid #CACACA;\n        border-width: 0 3px 3px 0;\n        padding: 3px;\n        transform: rotate(45deg);\n        -webkit-transform: rotate(45deg);\n        transition: 0.5s ease-in-out;\n        -webkit-transition: 0.5s ease-in-out;\n        -moz-transition: 0.5s ease-in-out;\n        -o-transition: 0.5s ease-in-out; }\n    go-vis li.open.branch > div::after {\n      transform: rotate(-135deg);\n      -webkit-transform: rotate(-135deg); }\n  go-vis .evidence-tag {\n    font-size: .7em;\n    padding: .5em;\n    background-color: #d3e8fe; }\n");
+___$insertStyle("go-vis {\n  font-family: Roboto; }\n  go-vis span {\n    margin-left: .5em; }\n  go-vis ul {\n    list-style: none;\n    margin: 0;\n    padding: 0; }\n  go-vis > ul {\n    padding: 1.5em;\n    border: 1px solid #CACACA;\n    columns: 2;\n    -webkit-columns: 2;\n    -moz-columns: 2; }\n  go-vis li ul {\n    display: none; }\n  go-vis li.open > ul {\n    display: block; }\n  go-vis li {\n    line-height: 2em; }\n    go-vis li.branch > div {\n      cursor: pointer; }\n      go-vis li.branch > div::after {\n        content: '';\n        display: inline-block;\n        margin: .5em;\n        vertical-align: text-bottom;\n        border: solid #CACACA;\n        border-width: 0 3px 3px 0;\n        padding: 3px;\n        transform: rotate(45deg);\n        -webkit-transform: rotate(45deg);\n        transition: 0.5s ease-in-out;\n        -webkit-transition: 0.5s ease-in-out;\n        -moz-transition: 0.5s ease-in-out;\n        -o-transition: 0.5s ease-in-out; }\n    go-vis li.open.branch > div::after {\n      transform: rotate(-135deg);\n      -webkit-transform: rotate(-135deg); }\n  go-vis .evidence-tag {\n    font-size: .7em;\n    padding: .5em;\n    background-color: #d3e8fe;\n    cursor: default; }\n");
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -253,7 +253,7 @@ var GoVis = function (_CustomElement2) {
             div.appendChild(span);
             li.appendChild(div);
             if (annotationNode) {
-                div.appendChild(this.getRenderSource(annotationNode.properties));
+                div.appendChild(this.getRenderSource(annotationNode));
             }
             if (node.children && node.children.length > 0) {
                 div.addEventListener('click', this.nodeClick);
@@ -370,49 +370,50 @@ var GoVis = function (_CustomElement2) {
         value: function getRenderSource(source) {
             var span = document.createElement('span');
             span.classList.add('evidence-tag');
-            span.textContent = source.source;
+            span.textContent = source.properties.source;
+            if (source.evidences) {
+                var evidences = '';
+                var _iteratorNormalCompletion7 = true;
+                var _didIteratorError7 = false;
+                var _iteratorError7 = undefined;
+
+                try {
+                    for (var _iterator7 = source.evidences[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                        var evidence = _step7.value;
+
+                        evidences = evidences + ' ' + evidence.source.name + ':' + evidence.source.id;
+                    }
+                } catch (err) {
+                    _didIteratorError7 = true;
+                    _iteratorError7 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                            _iterator7.return();
+                        }
+                    } finally {
+                        if (_didIteratorError7) {
+                            throw _iteratorError7;
+                        }
+                    }
+                }
+
+                span.title = evidences;
+            }
             return span;
         }
     }, {
         key: 'expandAll',
         value: function expandAll() {
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
-
-            try {
-                for (var _iterator7 = this.querySelectorAll('.branch')[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var li = _step7.value;
-
-                    li.classList.add('open');
-                }
-            } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                        _iterator7.return();
-                    }
-                } finally {
-                    if (_didIteratorError7) {
-                        throw _iteratorError7;
-                    }
-                }
-            }
-        }
-    }, {
-        key: 'collapseAll',
-        value: function collapseAll() {
             var _iteratorNormalCompletion8 = true;
             var _didIteratorError8 = false;
             var _iteratorError8 = undefined;
 
             try {
-                for (var _iterator8 = this.querySelectorAll('.open')[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                for (var _iterator8 = this.querySelectorAll('.branch')[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
                     var li = _step8.value;
 
-                    li.classList.remove('open');
+                    li.classList.add('open');
                 }
             } catch (err) {
                 _didIteratorError8 = true;
@@ -425,6 +426,34 @@ var GoVis = function (_CustomElement2) {
                 } finally {
                     if (_didIteratorError8) {
                         throw _iteratorError8;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'collapseAll',
+        value: function collapseAll() {
+            var _iteratorNormalCompletion9 = true;
+            var _didIteratorError9 = false;
+            var _iteratorError9 = undefined;
+
+            try {
+                for (var _iterator9 = this.querySelectorAll('.open')[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                    var li = _step9.value;
+
+                    li.classList.remove('open');
+                }
+            } catch (err) {
+                _didIteratorError9 = true;
+                _iteratorError9 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                        _iterator9.return();
+                    }
+                } finally {
+                    if (_didIteratorError9) {
+                        throw _iteratorError9;
                     }
                 }
             }
