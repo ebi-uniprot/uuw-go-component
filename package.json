@@ -1,5 +1,5 @@
 {
-    "name": "uuw-go-vis",
+    "name": "uuw-go-component",
     "version": "1.0.0",
     "description": "A visualisation for UniProt GO term annotation",
     "main": "main.js",

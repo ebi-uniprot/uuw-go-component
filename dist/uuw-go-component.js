@@ -18,7 +18,7 @@ function ___$insertStyle(css) {
   return css;
 }
 
-___$insertStyle("go-vis {\n  font-family: Roboto; }\n  go-vis span {\n    margin-left: .5em; }\n  go-vis ul {\n    list-style: none;\n    margin: 0;\n    padding: 0; }\n  go-vis > ul {\n    padding: 1.5em;\n    border: 1px solid #CACACA;\n    columns: 2;\n    -webkit-columns: 2;\n    -moz-columns: 2; }\n  go-vis li ul {\n    display: none; }\n  go-vis li.open > ul {\n    display: block; }\n  go-vis li {\n    line-height: 2em; }\n    go-vis li.branch > div {\n      cursor: pointer; }\n      go-vis li.branch > div::after {\n        content: '';\n        display: inline-block;\n        margin: .5em;\n        vertical-align: text-bottom;\n        border: solid #CACACA;\n        border-width: 0 3px 3px 0;\n        padding: 3px;\n        transform: rotate(45deg);\n        -webkit-transform: rotate(45deg);\n        transition: 0.5s ease-in-out;\n        -webkit-transition: 0.5s ease-in-out;\n        -moz-transition: 0.5s ease-in-out;\n        -o-transition: 0.5s ease-in-out; }\n    go-vis li.open.branch > div::after {\n      transform: rotate(-135deg);\n      -webkit-transform: rotate(-135deg); }\n  go-vis .evidence-tag {\n    font-size: .7em;\n    padding: .5em;\n    background-color: #d3e8fe;\n    cursor: default; }\n");
+___$insertStyle("uuw-go-component {\n  font-family: Roboto; }\n  uuw-go-component span {\n    margin-left: .5em; }\n  uuw-go-component ul {\n    list-style: none;\n    margin: 0;\n    padding: 0; }\n  uuw-go-component > ul {\n    padding: 1.5em;\n    border: 1px solid #CACACA;\n    columns: 2;\n    -webkit-columns: 2;\n    -moz-columns: 2; }\n  uuw-go-component li ul {\n    display: none; }\n  uuw-go-component li.open > ul {\n    display: block; }\n  uuw-go-component li {\n    line-height: 2em; }\n    uuw-go-component li.branch > div {\n      cursor: pointer; }\n      uuw-go-component li.branch > div::after {\n        content: '';\n        display: inline-block;\n        margin: .5em;\n        vertical-align: text-bottom;\n        border: solid #CACACA;\n        border-width: 0 3px 3px 0;\n        padding: 3px;\n        transform: rotate(45deg);\n        -webkit-transform: rotate(45deg);\n        transition: 0.5s ease-in-out;\n        -webkit-transition: 0.5s ease-in-out;\n        -moz-transition: 0.5s ease-in-out;\n        -o-transition: 0.5s ease-in-out; }\n    uuw-go-component li.open.branch > div::after {\n      transform: rotate(-135deg);\n      -webkit-transform: rotate(-135deg); }\n  uuw-go-component .evidence-tag {\n    font-size: .7em;\n    padding: .5em;\n    background-color: #d3e8fe;\n    cursor: default; }\n");
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -35,13 +35,13 @@ function _CustomElement() {
 
 Object.setPrototypeOf(_CustomElement.prototype, HTMLElement.prototype);
 Object.setPrototypeOf(_CustomElement, HTMLElement);
-var GoVis = function (_CustomElement2) {
-    _inherits(GoVis, _CustomElement2);
+var UuwGoComponent = function (_CustomElement2) {
+    _inherits(UuwGoComponent, _CustomElement2);
 
-    function GoVis() {
-        _classCallCheck(this, GoVis);
+    function UuwGoComponent() {
+        _classCallCheck(this, UuwGoComponent);
 
-        var _this = _possibleConstructorReturn(this, (GoVis.__proto__ || Object.getPrototypeOf(GoVis)).call(this));
+        var _this = _possibleConstructorReturn(this, (UuwGoComponent.__proto__ || Object.getPrototypeOf(UuwGoComponent)).call(this));
 
         _this.annotationTerms = [];
         _this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
@@ -49,7 +49,7 @@ var GoVis = function (_CustomElement2) {
         return _this;
     }
 
-    _createClass(GoVis, [{
+    _createClass(UuwGoComponent, [{
         key: 'connectedCallback',
         value: function connectedCallback() {
             this.loadData();
@@ -128,9 +128,7 @@ var GoVis = function (_CustomElement2) {
     }, {
         key: 'getAnnotationTerms',
         value: function getAnnotationTerms(accession) {
-            var headers = new Headers({
-                'Accept': 'application/json'
-            });
+            var headers = new Headers({ 'Accept': 'application/json' });
             var init = {
                 method: 'GET',
                 headers: headers,
@@ -485,12 +483,12 @@ var GoVis = function (_CustomElement2) {
         }
     }]);
 
-    return GoVis;
+    return UuwGoComponent;
 }(_CustomElement);
 
-customElements.define('go-vis', GoVis);
+customElements.define('uuw-go-component', UuwGoComponent);
 
-return GoVis;
+return UuwGoComponent;
 
 }());
-//# sourceMappingURL=govis.js.map
+//# sourceMappingURL=uuw-go-component.js.map

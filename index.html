@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <script src="dist/govis.js"></script>
+    <script src="dist/uuw-go-component.js"></script>
 </head>
 
 <body>
@@ -29,7 +29,7 @@
             </select>
         </label>
     </p>
-    <go-vis accession="P05067" slimset="goslim_generic" />
+    <uuw-go-component accession="P05067" slimset="goslim_generic" />
     <script>
         document.querySelector('#expand').addEventListener('click', d => {
             document.querySelector('go-vis').expandAll();

@@ -1,6 +1,6 @@
 import './govis.scss';
 
-class GoVis extends HTMLElement {
+class UuwGoComponent extends HTMLElement {
     constructor() {
         super();
         this.annotationTerms = [];
@@ -45,34 +45,51 @@ class GoVis extends HTMLElement {
 
     loadData() {
         console.log('loading...')
-        this.getAnnotationTerms(this.accession).then(stream => {
-            stream.json().then(d => {
-                this.annotationTerms = d.dbReferences.filter(d => d.type === 'GO');
-                let goIds = this.annotationTerms.filter(d => d.type === 'GO').map(d => d.id);
-                this.getSlimSet().then(stream => {
-                    stream.json().then(d => {
-                        const slimIds = d.goSlimSets.filter(f => f.name === this.slimset)[0].associations.map(term => term.id);
-                        // remove root nodes
-                        for (const rootNode of this.goRootNodes) {
-                            slimIds.splice(slimIds.indexOf(rootNode), 1);
-                        }
-                        this.getTermGraph(goIds, slimIds).then(d => d.json().then(graph => {
-                            const tree = this.buildTree(graph.results[0].vertices, graph.results[0].edges);
-                            const ul = document.createElement('ul');
-                            this.renderSlimsTree(tree, ul);
-                            this.appendChild(ul);
-                            console.log('Loaded')
-                        }));
+        this
+            .getAnnotationTerms(this.accession)
+            .then(stream => {
+                stream
+                    .json()
+                    .then(d => {
+                        this.annotationTerms = d
+                            .dbReferences
+                            .filter(d => d.type === 'GO');
+                        let goIds = this
+                            .annotationTerms
+                            .filter(d => d.type === 'GO')
+                            .map(d => d.id);
+                        this
+                            .getSlimSet()
+                            .then(stream => {
+                                stream
+                                    .json()
+                                    .then(d => {
+                                        const slimIds = d
+                                            .goSlimSets
+                                            .filter(f => f.name === this.slimset)[0]
+                                            .associations
+                                            .map(term => term.id);
+                                        // remove root nodes
+                                        for (const rootNode of this.goRootNodes) {
+                                            slimIds.splice(slimIds.indexOf(rootNode), 1);
+                                        }
+                                        this
+                                            .getTermGraph(goIds, slimIds)
+                                            .then(d => d.json().then(graph => {
+                                                const tree = this.buildTree(graph.results[0].vertices, graph.results[0].edges);
+                                                const ul = document.createElement('ul');
+                                                this.renderSlimsTree(tree, ul);
+                                                this.appendChild(ul);
+                                                console.log('Loaded')
+                                            }));
+                                    });
+                            })
                     });
-                })
             });
-        });
     }
 
     getAnnotationTerms(accession) {
-        const headers = new Headers({
-            'Accept': 'application/json'
-        });
+        const headers = new Headers({'Accept': 'application/json'});
         const init = {
             method: 'GET',
             headers: headers,
@@ -104,7 +121,9 @@ class GoVis extends HTMLElement {
             if (rootNodes.indexOf(child.id) >= 0) {
                 rootNodes.splice(rootNodes.indexOf(child.id), 1);
             }
-            parent.children.push(child);
+            parent
+                .children
+                .push(child);
         }
         // Return root nodes
         return nodes.filter(node => {
@@ -124,8 +143,12 @@ class GoVis extends HTMLElement {
         a.setAttribute('href', `http://www.ebi.ac.uk/QuickGO-Beta/term/${node.id}`);
         a.textContent = node.id;
         const span = document.createElement('span');
-        let annotationNode = this.annotationTerms.find(d => d.id === node.id);
-        span.style.fontWeight = annotationNode ? 'bold' : 'normal';
+        let annotationNode = this
+            .annotationTerms
+            .find(d => d.id === node.id);
+        span.style.fontWeight = annotationNode
+            ? 'bold'
+            : 'normal';
         span.textContent = node.label;
         div.appendChild(a);
         div.appendChild(span);
@@ -135,7 +158,9 @@ class GoVis extends HTMLElement {
         }
         if (node.children && node.children.length > 0) {
             div.addEventListener('click', this.nodeClick);
-            li.classList.add('branch');
+            li
+                .classList
+                .add('branch');
         }
         return li;
     }
@@ -172,12 +197,17 @@ class GoVis extends HTMLElement {
     }
 
     nodeClick() {
-        this.parentElement.classList.toggle('open');
+        this
+            .parentElement
+            .classList
+            .toggle('open');
     }
 
     getRenderSource(source) {
         const span = document.createElement('span');
-        span.classList.add('evidence-tag');
+        span
+            .classList
+            .add('evidence-tag');
         span.textContent = source.properties.source;
         if (source.evidences) {
             let evidences = '';
@@ -191,17 +221,21 @@ class GoVis extends HTMLElement {
 
     expandAll() {
         for (const li of this.querySelectorAll('.branch')) {
-            li.classList.add('open');
+            li
+                .classList
+                .add('open');
         }
     }
 
     collapseAll() {
         for (const li of this.querySelectorAll('.open')) {
-            li.classList.remove('open');
+            li
+                .classList
+                .remove('open');
         }
     }
 }
 
-customElements.define('go-vis', GoVis);
+customElements.define('uuw-go-component', UuwGoComponent);
 
-export default GoVis;
+export default UuwGoComponent;

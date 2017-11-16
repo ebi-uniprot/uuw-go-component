@@ -1,9 +1,9 @@
-# uuw-go-vis
+# uuw-go-component
 A custom element for displaying GO annotations for a given UniProt accession
 
 ## Usage
 ```
-<go-vis accession="P05067" />
+<uuw-go-component accession="P05067" />
 ```
 ### API
 - `expandAll` expands all nodes
