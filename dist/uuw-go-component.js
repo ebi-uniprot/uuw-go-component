@@ -1,4 +1,4 @@
-var GoVis = (function () {
+var UuwGoComponent = (function () {
 'use strict';
 
 function ___$insertStyle(css) {
@@ -20,28 +20,196 @@ function ___$insertStyle(css) {
 
 ___$insertStyle("uuw-go-component {\n  font-family: Roboto; }\n  uuw-go-component span {\n    margin-left: .5em; }\n  uuw-go-component ul {\n    list-style: none;\n    margin: 0;\n    padding: 0; }\n  uuw-go-component > ul {\n    padding: 1.5em;\n    border: 1px solid #CACACA;\n    columns: 2;\n    -webkit-columns: 2;\n    -moz-columns: 2; }\n  uuw-go-component li ul {\n    display: none; }\n  uuw-go-component li.open > ul {\n    display: block; }\n  uuw-go-component li {\n    line-height: 2em; }\n    uuw-go-component li.branch > div {\n      cursor: pointer; }\n      uuw-go-component li.branch > div::after {\n        content: '';\n        display: inline-block;\n        margin: .5em;\n        vertical-align: text-bottom;\n        border: solid #CACACA;\n        border-width: 0 3px 3px 0;\n        padding: 3px;\n        transform: rotate(45deg);\n        -webkit-transform: rotate(45deg);\n        transition: 0.5s ease-in-out;\n        -webkit-transition: 0.5s ease-in-out;\n        -moz-transition: 0.5s ease-in-out;\n        -o-transition: 0.5s ease-in-out; }\n    uuw-go-component li.open.branch > div::after {\n      transform: rotate(-135deg);\n      -webkit-transform: rotate(-135deg); }\n  uuw-go-component .evidence-tag {\n    font-size: .7em;\n    padding: .5em;\n    background-color: #d3e8fe;\n    cursor: default; }\n");
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+  function AsyncGenerator(gen) {
+    var front, back;
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
 
-function _CustomElement() {
-    return Reflect.construct(HTMLElement, [], this.__proto__.constructor);
-}
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
 
 
-Object.setPrototypeOf(_CustomElement.prototype, HTMLElement.prototype);
-Object.setPrototypeOf(_CustomElement, HTMLElement);
-var UuwGoComponent = function (_CustomElement2) {
-    _inherits(UuwGoComponent, _CustomElement2);
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+
+
+
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+var UuwGoComponent = function (_HTMLElement) {
+    inherits(UuwGoComponent, _HTMLElement);
 
     function UuwGoComponent() {
-        _classCallCheck(this, UuwGoComponent);
+        classCallCheck(this, UuwGoComponent);
 
-        var _this = _possibleConstructorReturn(this, (UuwGoComponent.__proto__ || Object.getPrototypeOf(UuwGoComponent)).call(this));
+        var _this = possibleConstructorReturn(this, (UuwGoComponent.__proto__ || Object.getPrototypeOf(UuwGoComponent)).call(this));
 
         _this.annotationTerms = [];
         _this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
@@ -49,7 +217,7 @@ var UuwGoComponent = function (_CustomElement2) {
         return _this;
     }
 
-    _createClass(UuwGoComponent, [{
+    createClass(UuwGoComponent, [{
         key: 'connectedCallback',
         value: function connectedCallback() {
             this.loadData();
@@ -157,32 +325,33 @@ var UuwGoComponent = function (_CustomElement2) {
             var rootNodes = nodes.map(function (n) {
                 return n.id;
             });
+
+            var _loop = function _loop(edge) {
+                var parent = nodes.filter(function (node) {
+                    return node.id === edge.object;
+                })[0];
+                var child = nodes.filter(function (node) {
+                    return node.id === edge.subject;
+                })[0];
+                // check for bug in backend
+                if (!parent || !child) {
+                    return 'continue';
+                }
+                if (rootNodes.indexOf(child.id) >= 0) {
+                    rootNodes.splice(rootNodes.indexOf(child.id), 1);
+                }
+                parent.children.push(child);
+            };
+
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
 
             try {
-                var _loop = function _loop() {
+                for (var _iterator2 = edges[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var edge = _step2.value;
 
-                    var parent = nodes.filter(function (node) {
-                        return node.id === edge.object;
-                    })[0];
-                    var child = nodes.filter(function (node) {
-                        return node.id === edge.subject;
-                    })[0];
-                    // check for bug in backend
-                    if (!parent || !child) {
-                        return 'continue';
-                    }
-                    if (rootNodes.indexOf(child.id) >= 0) {
-                        rootNodes.splice(rootNodes.indexOf(child.id), 1);
-                    }
-                    parent.children.push(child);
-                };
-
-                for (var _iterator2 = edges[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var _ret = _loop();
+                    var _ret = _loop(edge);
 
                     if (_ret === 'continue') continue;
                 }
@@ -458,33 +627,32 @@ var UuwGoComponent = function (_CustomElement2) {
         }
     }, {
         key: 'accession',
-        set: function set(acc) {
+        set: function set$$1(acc) {
             if (acc) {
                 this.setAttribute('accession', acc);
             }
         },
-        get: function get() {
+        get: function get$$1() {
             return this.getAttribute('accession');
         }
     }, {
         key: 'slimset',
-        get: function get() {
+        get: function get$$1() {
             return this.getAttribute('slimset');
         },
-        set: function set(slimset) {
+        set: function set$$1(slimset) {
             if (slimset) {
                 this.setAttribute('slimset', slimset);
             }
         }
     }], [{
         key: 'observedAttributes',
-        get: function get() {
+        get: function get$$1() {
             return ['accession', 'slimset'];
         }
     }]);
-
     return UuwGoComponent;
-}(_CustomElement);
+}(HTMLElement);
 
 customElements.define('uuw-go-component', UuwGoComponent);
 
