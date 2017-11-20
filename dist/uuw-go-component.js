@@ -214,6 +214,7 @@ var UuwGoComponent = function (_HTMLElement) {
         _this.annotationTerms = [];
         _this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
         _this.accession = '';
+        _this.loadData = _this.loadData.bind(_this);
         return _this;
     }
 
@@ -235,7 +236,7 @@ var UuwGoComponent = function (_HTMLElement) {
         value: function loadData() {
             var _this2 = this;
 
-            console.log('loading...');
+            console.log('loading go terms tree...');
             this.getAnnotationTerms(this.accession).then(function (stream) {
                 stream.json().then(function (d) {
                     _this2.annotationTerms = d.dbReferences.filter(function (d) {
@@ -285,7 +286,7 @@ var UuwGoComponent = function (_HTMLElement) {
                                     var ul = document.createElement('ul');
                                     _this2.renderSlimsTree(tree, ul);
                                     _this2.appendChild(ul);
-                                    console.log('Loaded');
+                                    console.log('Loaded go terms tree');
                                 });
                             });
                         });

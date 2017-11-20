@@ -6,6 +6,9 @@ class UuwGoComponent extends HTMLElement {
         this.annotationTerms = [];
         this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
         this.accession = '';
+        this.loadData = this
+            .loadData
+            .bind(this);
     }
 
     connectedCallback() {
@@ -44,7 +47,7 @@ class UuwGoComponent extends HTMLElement {
     }
 
     loadData() {
-        console.log('loading...')
+        console.log('loading go terms tree...')
         this
             .getAnnotationTerms(this.accession)
             .then(stream => {
@@ -80,7 +83,7 @@ class UuwGoComponent extends HTMLElement {
                                                 const ul = document.createElement('ul');
                                                 this.renderSlimsTree(tree, ul);
                                                 this.appendChild(ul);
-                                                console.log('Loaded')
+                                                console.log('Loaded go terms tree')
                                             }));
                                     });
                             })
