@@ -5,7 +5,10 @@ class UuwGoComponent extends HTMLElement {
         super();
         this.annotationTerms = [];
         this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
-        this.accession = '';
+        this.accession = this.getAttribute('accession');
+        this.aspect = this.getAttribute('aspect')
+            ? this.getAttribute('aspect')
+            : '';
         this.loadData = this
             .loadData
             .bind(this);
@@ -46,8 +49,16 @@ class UuwGoComponent extends HTMLElement {
         return this.getAttribute('accession');
     }
 
+    set aspect(aspect) {
+        this.setAttribute('aspect', aspect);
+    }
+
+    get aspect() {
+        return this.getAttribute('aspect');
+    }
+
     loadData() {
-        console.log('loading go terms tree...')
+        console.log('loading go terms tree...');
         this
             .getAnnotationTerms(this.accession)
             .then(stream => {
@@ -71,7 +82,9 @@ class UuwGoComponent extends HTMLElement {
                                             .goSlimSets
                                             .filter(f => f.name === this.slimset)[0]
                                             .associations
+                                            .filter(f => this.aspect === '' || f.aspect === this.aspect)
                                             .map(term => term.id);
+
                                         // remove root nodes
                                         for (const rootNode of this.goRootNodes) {
                                             slimIds.splice(slimIds.indexOf(rootNode), 1);

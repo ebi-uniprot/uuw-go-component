@@ -18,7 +18,7 @@ function ___$insertStyle(css) {
   return css;
 }
 
-___$insertStyle("uuw-go-component {\n  font-family: Roboto; }\n  uuw-go-component span {\n    margin-left: .5em; }\n  uuw-go-component ul {\n    list-style: none;\n    margin: 0;\n    padding: 0; }\n  uuw-go-component > ul {\n    padding: 1.5em;\n    border: 1px solid #CACACA;\n    columns: 2;\n    -webkit-columns: 2;\n    -moz-columns: 2; }\n  uuw-go-component li ul {\n    display: none; }\n  uuw-go-component li.open > ul {\n    display: block; }\n  uuw-go-component li {\n    line-height: 2em; }\n    uuw-go-component li.branch > div {\n      cursor: pointer; }\n      uuw-go-component li.branch > div::after {\n        content: '';\n        display: inline-block;\n        margin: .5em;\n        vertical-align: text-bottom;\n        border: solid #CACACA;\n        border-width: 0 3px 3px 0;\n        padding: 3px;\n        transform: rotate(45deg);\n        -webkit-transform: rotate(45deg);\n        transition: 0.5s ease-in-out;\n        -webkit-transition: 0.5s ease-in-out;\n        -moz-transition: 0.5s ease-in-out;\n        -o-transition: 0.5s ease-in-out; }\n    uuw-go-component li.open.branch > div::after {\n      transform: rotate(-135deg);\n      -webkit-transform: rotate(-135deg); }\n  uuw-go-component .evidence-tag {\n    font-size: .7em;\n    padding: .5em;\n    background-color: #d3e8fe;\n    cursor: default; }\n");
+___$insertStyle("uuw-go-component span {\n  margin-left: .5em; }\n\nuuw-go-component ul {\n  list-style: none;\n  margin: 0;\n  padding: 0; }\n\nuuw-go-component > ul {\n  padding: 1.5em;\n  columns: 2;\n  -webkit-columns: 2;\n  -moz-columns: 2; }\n\nuuw-go-component li ul {\n  display: none; }\n\nuuw-go-component li.open > ul {\n  display: block; }\n\nuuw-go-component li {\n  line-height: 2em; }\n  uuw-go-component li.branch > div {\n    cursor: pointer; }\n    uuw-go-component li.branch > div::after {\n      content: '';\n      display: inline-block;\n      margin: .5em;\n      vertical-align: text-bottom;\n      border: solid #CACACA;\n      border-width: 0 3px 3px 0;\n      padding: 3px;\n      transform: rotate(45deg);\n      -webkit-transform: rotate(45deg);\n      transition: 0.5s ease-in-out;\n      -webkit-transition: 0.5s ease-in-out;\n      -moz-transition: 0.5s ease-in-out;\n      -o-transition: 0.5s ease-in-out; }\n  uuw-go-component li.open.branch > div::after {\n    transform: rotate(-135deg);\n    -webkit-transform: rotate(-135deg); }\n\nuuw-go-component .evidence-tag {\n  font-size: .7em;\n  padding: .5em;\n  background-color: #d3e8fe;\n  cursor: default; }\n");
 
 var asyncGenerator = function () {
   function AwaitValue(value) {
@@ -213,7 +213,8 @@ var UuwGoComponent = function (_HTMLElement) {
 
         _this.annotationTerms = [];
         _this.goRootNodes = ['GO:0008150', 'GO:0003674', 'GO:0005575'];
-        _this.accession = '';
+        _this.accession = _this.getAttribute('accession');
+        _this.aspect = _this.getAttribute('aspect') ? _this.getAttribute('aspect') : '';
         _this.loadData = _this.loadData.bind(_this);
         return _this;
     }
@@ -251,9 +252,12 @@ var UuwGoComponent = function (_HTMLElement) {
                         stream.json().then(function (d) {
                             var slimIds = d.goSlimSets.filter(function (f) {
                                 return f.name === _this2.slimset;
-                            })[0].associations.map(function (term) {
+                            })[0].associations.filter(function (f) {
+                                return _this2.aspect === '' || f.aspect === _this2.aspect;
+                            }).map(function (term) {
                                 return term.id;
                             });
+
                             // remove root nodes
                             var _iteratorNormalCompletion = true;
                             var _didIteratorError = false;
@@ -645,6 +649,14 @@ var UuwGoComponent = function (_HTMLElement) {
             if (slimset) {
                 this.setAttribute('slimset', slimset);
             }
+        }
+    }, {
+        key: 'aspect',
+        set: function set$$1(aspect) {
+            this.setAttribute('aspect', aspect);
+        },
+        get: function get$$1() {
+            return this.getAttribute('aspect');
         }
     }], [{
         key: 'observedAttributes',

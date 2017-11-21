@@ -28,21 +28,21 @@
             </select>
         </label>
     </p>
-    <uuw-go-component accession="P05067" slimset="goslim_generic" />
+    <uuw-go-component accession="P05067" slimset="goslim_generic" aspect="cellular_component"/>
     <script>
         document.querySelector('#expand').addEventListener('click', d => {
-            document.querySelector('go-vis').expandAll();
+            document.querySelector('uuw-go-component').expandAll();
         });
         document.querySelector('#collapse').addEventListener('click', d => {
-            document.querySelector('go-vis').collapseAll();
+            document.querySelector('uuw-go-component').collapseAll();
         });
 
         document.querySelector('#load').addEventListener('click', d => {
-            document.querySelector('go-vis').setAttribute('accession', document.querySelector('#accession').value);
+            document.querySelector('uuw-go-component').setAttribute('accession', document.querySelector('#accession').value);
         });
 
         document.querySelector('#slimset').addEventListener('change', d => {
-            document.querySelector('go-vis').setAttribute('slimset', d.target.value);
+            document.querySelector('uuw-go-component').setAttribute('slimset', d.target.value);
         });
     </script>
     <!-- Required for IE11 -->

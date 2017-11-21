@@ -2,7 +2,6 @@ $light-grey: #CACACA;
 $transition-time: .5s;
 $colour-evidence-source:#d3e8fe;
 uuw-go-component {
-    font-family: Roboto;
     span {
         margin-left: .5em;
     }
@@ -13,7 +12,6 @@ uuw-go-component {
     }
     &>ul {
         padding: 1.5em;
-        border: 1px solid $light-grey;
         columns: 2;
         -webkit-columns: 2;
         -moz-columns: 2;
