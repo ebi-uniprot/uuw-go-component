@@ -1,7 +1,7 @@
 {
     "name": "uuw-go-component",
     "description": "Display GO terms slimmed to predefined slimsets",
-    "version": "0.0.2",    
+    "version": "0.0.3",    
     "main": "src/main.js",
     "scripts": {
         "build-dev": "rollup -c",
